@@ -1,0 +1,86 @@
+diff --git a/node_modules/avrgirl-arduino/avrgirl-arduino.js b/node_modules/avrgirl-arduino/avrgirl-arduino.js
+index 96f0906..e004706 100644
+--- a/node_modules/avrgirl-arduino/avrgirl-arduino.js
++++ b/node_modules/avrgirl-arduino/avrgirl-arduino.js
+@@ -117,6 +117,38 @@ var injectDependencies = function(boards, Connection, protocols) {
+     });
+   };
+ 
++  AvrgirlArduino.prototype.sendMessage = function(data, callback) {
++    var _this = this;
++  
++    // validate board properties first
++    _this._validateBoard(function(error) {
++      if (error) { return callback(error); }
++  
++      // set up serialport connection
++      _this.connection._init(function(error) {
++        if (error) { return callback(error); }
++  
++        _this.connection.serialPort.open(function (error) {
++          if ( error ) {
++            console.log('failed to open: '+error);
++          } else {
++            console.log('open');
++  
++            _this.connection.serialPort.on('data', function(data) {
++              console.log('data received: ' + data);
++            });
++  
++            // Wait 750ms and then send data, in order to get an echo back
++            setTimeout(function() { _this.connection.serialPort.write(data); }, 750);
++  
++          }
++        });
++  
++      });
++    });
++  
++  };
++
+   /**
+    * Return a list of devices on serial ports. In addition to the output provided
+    * by SerialPort.list, it adds a platform independent PID in _pid
+diff --git a/node_modules/avrgirl-arduino/dist/avrgirl-arduino.js b/node_modules/avrgirl-arduino/dist/avrgirl-arduino.js
+index 1834a95..2dcb05f 100644
+--- a/node_modules/avrgirl-arduino/dist/avrgirl-arduino.js
++++ b/node_modules/avrgirl-arduino/dist/avrgirl-arduino.js
+@@ -147,6 +147,38 @@ var injectDependencies = function(boards, Connection, protocols) {
+     });
+   };
+ 
++  AvrgirlArduino.prototype.sendMessage = function(data, callback) {
++    var _this = this;
++  
++    // validate board properties first
++    _this._validateBoard(function(error) {
++      if (error) { return callback(error); }
++  
++      // set up serialport connection
++      _this.connection._init(function(error) {
++        if (error) { return callback(error); }
++  
++        _this.connection.serialPort.open(function (error) {
++          if ( error ) {
++            console.log('failed to open: '+error);
++          } else {
++            console.log('open');
++  
++            _this.connection.serialPort.on('data', function(data) {
++              console.log('data received: ' + data);
++            });
++  
++            // Wait 750ms and then send data, in order to get an echo back
++            setTimeout(function() { _this.connection.serialPort.write(data); }, 750);
++  
++          }
++        });
++  
++      });
++    });
++  
++  };
++
+   /**
+    * Return a list of devices on serial ports. In addition to the output provided
+    * by SerialPort.list, it adds a platform independent PID in _pid

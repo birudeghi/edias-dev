@@ -1,9 +1,16 @@
 const express = require('express');
 const cors = require('cors');
+const { graphqlHTTP } = require('express-graphql');
+const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
 const path = require('path');
 
-require('dotenv').config();
+const boardSchema = buildSchema(`
+    type Query {
+        name: String
+        baud: Int
+    }
+`)
 
 const app = express();
 const port = process.env.PORT || 5000;

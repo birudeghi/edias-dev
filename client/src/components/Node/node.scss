@@ -1,0 +1,33 @@
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+$success: #24A148;
+$warning: #F1C21B;
+$failure: #DA1E28;
+
+
+
+$status: (
+    'success': $success,
+    'warning': $warning,
+    'failure': $failure,
+);
+
+@each $state, $hex in $status {
+    .node-button__#{$state} {
+        border-radius: 50px;
+        background-color: $hex;
+    }
+
+    .node-content__#{$state} {
+        border-radius: 50px;
+        border: 1px solid $hex;
+    }
+}
+
+.icon__dark {
+    color: #111111;
+}
+
+.icon__light {
+    color: #FFFFFF;
+}
