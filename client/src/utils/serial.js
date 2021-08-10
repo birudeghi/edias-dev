@@ -14,8 +14,20 @@ export const openSerial = (port) => {
                 reject("Failed to open: " + error);
             } else {
                 console.log("Port open.")
+                port.on('data', function(data) {
+                    console.log("data received: ", data);
+                });
                 resolve(true);
             }
+        });
+    })
+}
+
+export const readSerial = port => {
+    return new Promise ((resolve, reject) => {
+        port.on('data', function(data) {
+            console.log("data received: ", data);
+            resolve(data);
         });
     })
 }
