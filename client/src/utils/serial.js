@@ -1,87 +1,69 @@
 import SerialPort from 'avrgirl-arduino/lib/browser-serialport';
+import EventEmitter from 'events';
 
-export const newSerial = (baud) => {
-    return new SerialPort({
-        baudRate: baud
-    });
-}
+class PortalSerial extends EventEmitter {
+    constructor() {
+        super();
+        this.baud = 9600
+        this.connected = false
+        this.port = null //stub for browser-serialport
+        this.serial = null
 
-export const openSerial = (port) => {
-    return new Promise((resolve, reject) => {
-        port.open(function (error) {
-            if (error) {
-                console.log("Failed to open: " + error);
-                reject("Failed to open: " + error);
-            } else {
-                console.log("Port open.")
-                port.on('data', function(data) {
-                    console.log("data received: ", data);
-                });
-                resolve(true);
-            }
+        this._handleData = (buff) => {
+            this.emit('data', buff);
+        }
+    }
+
+    setBaud(baud) {
+        this.baud = baud;
+    }
+
+    setupSerial() {
+        this.serial = new SerialPort(this.port, {
+            baudRate: this.baud,
+            autoOpen: false
         });
-    })
-}
+        this.serial.on('data', this._handleData);
+    }
 
-export const readSerial = port => {
-    return new Promise ((resolve, reject) => {
-        port.on('data', function(data) {
-            console.log("data received: ", data);
-            resolve(data);
-        });
-    })
-}
-
-export const closeSerial = (port) => {
-    if (port.isOpen) {
-        port.close(function (error) {
-            if (error) {
-                console.log("Failed to close: " + error)
-                return false;
-            } else {
-                if (!port.isOpen) {
-                    return true;
+    openSerial() {
+        return new Promise((resolve, reject) => {
+            this.serial.open(function (error) {
+                if (error) {
+                    console.log("Failed to open: " + error);
+                    reject("Failed to open: " + error);
+                } else {
+                    console.log("Port open.")
+                    resolve(true);
                 }
-            }
+            });
         })
     }
+    
+    readSerial() {
+        return new Promise((resolve, reject) => {
+            this.serial.on('data', function(data) {
+                console.log("data received: ", data);
+                resolve(data);
+            })
+        })
+    }
+
+    closeSerial() {
+        if (this.serial.isOpen) {
+            this.serial.close(function (error) {
+                if (error) {
+                    console.log("Failed to close: " + error)
+                    return false;
+                } else {
+                    if (!this.serial.isOpen) {
+                        return true;
+                    }
+                }
+            })
+        }
+    }
+    
 }
 
-// const readBuff = (port) => {
-//     return new Promise((resolve, reject) => port.read((buff, err) => {
-//       if (err) reject(err);
-//       else resolve();
-//     }));
-//   }
-
-// export async function read(port, size) {
-//     const buff = await readBuff(port);
-//     return buff && buff.slice(0, Math.min(buff.length, size || Infinity));
-// }
-
-// const writeBuff = (port, buff) => {
-//     // eslint-disable-next-line no-console
-//     console.log('write', buff.toString('hex'));
-//     return new Promise((resolve, reject) => port.write(buff, (err) => {
-//       if (err) reject(err);
-//       else resolve();
-//     }));
-//   }
-
-// export async function write(port, message, encoding = null, cb = () => {}) {
-// if (typeof encoding === 'function') {
-//     // eslint-disable-next-line no-param-reassign
-//     cb = encoding;
-//     // eslint-disable-next-line no-param-reassign
-//     encoding = null;
-// }
-// if (typeof message === 'string') return;
-// try {
-//     await writeBuff(port, typeof message === 'string' ? Buffer.from(message, encoding) : message);
-// } catch (err) {
-//     cb?.(err);
-//     return;
-// }
-// cb?.();
-// }
-//insert eventemitter.on('data') here to allow reading serial data to xterm
+export default PortalSerial;

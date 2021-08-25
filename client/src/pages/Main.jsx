@@ -1,11 +1,12 @@
 import React , { useState } from 'react';
 import { newSerial } from '../utils/serial';
 import Portal from "../components/Portal";
+import PortalSerial from "../utils/serial";
 import ArduinoInitialise from "../plugins/ArduinoInitialise";
 
 import "./main.scss";
 
-const serial1 = newSerial();
+const serial1 = new PortalSerial();
 
 const Main = () => {
     const [connect, setConnect] = useState(false);
